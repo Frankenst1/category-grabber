@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         Category Grabber
-// @namespace    http://tampermonkey.net/
+// @namespace    https://github.com/Frankenst1/category-grabber
 // @version      0.1
 // @description  try to take over the world!
 // @author       Frankenst1
-// @updateURL    https://github.com/Frankenst1/category-grabbe/raw/main/main.js
-// @downloadURL  https://github.com/Frankenst1/category-grabbe/raw/main/main.js
+// @updateURL    https://github.com/Frankenst1/category-grabber/raw/main/main.js
+// @downloadURL  https://github.com/Frankenst1/category-grabber/raw/main/main.js
 // @match        https://www.definebabe.com/categories/
 // @match        https://www.freeones.com/categories
 // @match        https://www.pornhub.com/categories
