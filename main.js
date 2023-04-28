@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         Category Grabber
+// @name         Category Grabber (local)
 // @namespace    https://github.com/Frankenst1/category-grabber
-// @version      0.1
+// @version      0.2
 // @description  Grabber to take data for data hoarding purposes.
 // @author       Frankenst1
 // @updateURL    https://github.com/Frankenst1/category-grabber/raw/main/main.js
@@ -9,15 +9,14 @@
 // @match        https://www.definebabe.com/categories/
 // @match        https://www.freeones.com/categories
 // @match        https://www.pornhub.com/categories
+// @match        https://xhamster.com/categories
 // @icon         https://cdn-icons-png.flaticon.com/512/6577/6577637.png
 // @grant        GM_download
-// @license      MIT
 // ==/UserScript==
 
 (function() {
     'use strict';
 
-    // Define babes setup.
     if(location.host.includes('definebabe.com')){
         const defineBabesData = getAllCategories('.models-wost > .models-wost__col', '.models-footer > p', '.models-image > img');
         addDownloadBtn('btn btn-light', defineBabesData, '.main-container');
@@ -29,9 +28,13 @@
     }
 
     if(location.host.includes('pornhub.com')){
-        // currently only supports pornhub.
-        const pornhubData = getCategoriesWithSubcategories();
+        const pornhubData = getCategoriesWithSubcategories('.categoriesPage .categoriesSlidersWrapper .level1Category', 'h2', '.categories .category-wrapper', '.categoryTitleWrapper > a > strong', 'img');
         addDownloadBtn('greyButton', pornhubData, '.categoriesPage', true);
+    }
+
+    if(location.host.includes('xhamster.com')){
+        const xhamsterData = getCategoriesWithSubcategories('main section', 'h2','div > a','div > h3','img');
+        addDownloadBtn('xh-wide-button', xhamsterData, 'main .xh-header', true);
     }
 
     function getAllCategories(categoryWrapperQuery, categoryNameSelector, categoryImageSelector, imageSrcAttribute = 'src'){
@@ -54,20 +57,17 @@
         return JSON.stringify(categories);
     }
 
-    // TODO: currently for pornhub, needs to become more generic.
-    function getCategoriesWithSubcategories(){
+    function getCategoriesWithSubcategories(parentWrapperQuery, categoryNameSelector, subCategorySelector, subCategoryNameSelector, subCategoryImageSelector, imageAttribute = 'src'){
         const categories = [];
-        let wrappers = document.querySelectorAll('.categoriesPage .categoriesSlidersWrapper .level1Category');
+        let wrappers = document.querySelectorAll(parentWrapperQuery);
         wrappers.forEach((categoryWrapper) => {
-            let categoryName = categoryWrapper.querySelector('h2').innerText;
-            //let imagePath = categoryWrapper.querySelector(categoryImageSelector)?.getAttribute('src');
-            //imagePath = new URL(imagePath, document.baseURI).href;
+            let categoryName = categoryWrapper.querySelector(categoryNameSelector).innerText;
 
-            let subcatWrappers = categoryWrapper.querySelectorAll('.categories .category-wrapper');
+            let subcatWrappers = categoryWrapper.querySelectorAll(subCategorySelector);
             const subCategories = [];
             subcatWrappers.forEach((subcatWrapper) => {
-                let categoryName = subcatWrapper.querySelector('.categoryTitleWrapper > a > strong').innerText;
-                let imagePath = subcatWrapper.querySelector('img')?.getAttribute('src');
+                let categoryName = subcatWrapper.querySelector(subCategoryNameSelector).innerText;
+                let imagePath = subcatWrapper.querySelector(subCategoryImageSelector)?.getAttribute(imageAttribute);
                 imagePath = new URL(imagePath, document.baseURI).href;
 
                 subCategories.push({ name: categoryName, image: imagePath });
@@ -94,11 +94,13 @@
         dwnldBtn.addEventListener('click', (e)=>{
             e.preventDefault();
             downloadCategoryImagesFromJson(jsonData, hasSubCategories);
+            downloadJsonData(jsonData);
         });
 
         // Add element as first child.
         const parentElement = document.querySelector(parentSelector);
         parentElement.insertBefore(dwnldBtn, parentElement.firstChild);
+        console.log(jsonData);
     }
 
     function downloadCategoryImagesFromJson(jsonString, hasSubCategories = false){
@@ -141,5 +143,9 @@
             subCategoriesTotal += mainCategory.sub_categories.length;
         });
         return subCategoriesTotal;
+    }
+
+    function downloadJsonData(jsonString){
+        console.log(jsonString);
     }
 })();
