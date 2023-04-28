@@ -2,7 +2,7 @@
 // @name         Category Grabber
 // @namespace    https://github.com/Frankenst1/category-grabber
 // @version      0.1
-// @description  try to take over the world!
+// @description  Grabber to take data for data hoarding purposes.
 // @author       Frankenst1
 // @updateURL    https://github.com/Frankenst1/category-grabber/raw/main/main.js
 // @downloadURL  https://github.com/Frankenst1/category-grabber/raw/main/main.js
@@ -11,6 +11,7 @@
 // @match        https://www.pornhub.com/categories
 // @icon         https://cdn-icons-png.flaticon.com/512/6577/6577637.png
 // @grant        GM_download
+// @license      MIT
 // ==/UserScript==
 
 (function() {
