@@ -1,13 +1,13 @@
 // ==UserScript==
-// @name         Category Grabber (local)
+// @name         Category Grabber
 // @namespace    https://github.com/Frankenst1/category-grabber
-// @version      0.2
+// @version      0.3
 // @description  Grabber to take data for data hoarding purposes.
 // @author       Frankenst1
 // @updateURL    https://github.com/Frankenst1/category-grabber/raw/main/main.js
 // @downloadURL  https://github.com/Frankenst1/category-grabber/raw/main/main.js
 // @match        https://www.definebabe.com/categories/
-// @match        https://www.freeones.com/categories
+// @match        https://www.freeones.com/categories*
 // @match        https://www.pornhub.com/categories
 // @match        https://xhamster.com/categories
 // @icon         https://cdn-icons-png.flaticon.com/512/6577/6577637.png
@@ -23,7 +23,7 @@
     }
 
     if(location.host.includes('freeones.com')){
-        const freeOnesData = getAllCategories('.teasers-container--grid > .teaser-category > .teaser__link','[data-test=category-name]','.image-content', 'data-src');
+        const freeOnesData = getAllCategories('.teasers-container--grid > .teaser-category > .teaser__link','[data-test=category-name]','.image-content', 'src');
         addDownloadBtn('btn btn-outline btn-block btn-all', freeOnesData, '.main-header');
     }
 
@@ -37,7 +37,7 @@
         addDownloadBtn('xh-wide-button', xhamsterData, 'main .xh-header', true);
     }
 
-    function getAllCategories(categoryWrapperQuery, categoryNameSelector, categoryImageSelector, imageSrcAttribute = 'src'){
+    function getAllCategories(categoryWrapperQuery, categoryNameSelector, categoryImageSelector, imageSrcAttribute = 'src', imageSrcAttributeLazyLoading = 'data-src'){
         const categories = [];
 
         // Will extend this later so this is reusable depending on the site.
@@ -46,7 +46,9 @@
         wrappers.forEach((categoryWrapper) => {
             let categoryName = categoryWrapper.querySelector(categoryNameSelector).innerText;
             let imagePath = categoryWrapper.querySelector(categoryImageSelector)?.getAttribute(imageSrcAttribute);
-            imagePath = new URL(imagePath, document.baseURI).href;
+            if(imagePath == null){
+                imagePath = categoryWrapper.querySelector(categoryImageSelector)?.getAttribute(imageSrcAttributeLazyLoading);
+            }
 
             const category = { name: categoryName, image: imagePath };
 
@@ -54,6 +56,7 @@
         });
 
         // Return the data as json.
+        console.log(categories);
         return JSON.stringify(categories);
     }
 
@@ -100,7 +103,6 @@
         // Add element as first child.
         const parentElement = document.querySelector(parentSelector);
         parentElement.insertBefore(dwnldBtn, parentElement.firstChild);
-        console.log(jsonData);
     }
 
     function downloadCategoryImagesFromJson(jsonString, hasSubCategories = false){
